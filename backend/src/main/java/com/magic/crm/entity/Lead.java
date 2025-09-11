@@ -3,32 +3,26 @@ package com.magic.crm.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-
-import org.apache.ibatis.mapping.FetchType;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.Where;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 /**
- * 客户实体
+ * 线索实体
  */
 @Entity
-@Table(name = "customers")
+@Table(name = "leads")
 @Where(clause = "deleted = false")
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-public class Customer {
+public class Lead {
     
     @Id
     @GeneratedValue(generator = "uuid2")
@@ -37,16 +31,25 @@ public class Customer {
     private UUID id;
     
     @Column(name = "code", length = 50, unique = true, nullable = false)
-    private String code; // 客户编号
+    private String code; // 线索编号
     
     @Column(name = "name", length = 200, nullable = false)
-    private String name; // 客户名称
+    private String name; // 线索名称
     
-    @Column(name = "short_name", length = 100)
-    private String shortName; // 简称
+    @Column(name = "company_name", length = 200)
+    private String companyName; // 公司名称
     
-    @Column(name = "uscc", length = 50)
-    private String uscc; // 统一社会信用代码
+    @Column(name = "contact_name", length = 100)
+    private String contactName; // 联系人姓名
+    
+    @Column(name = "contact_phone", length = 20)
+    private String contactPhone; // 联系人电话
+    
+    @Column(name = "contact_email", length = 100)
+    private String contactEmail; // 联系人邮箱
+    
+    @Column(name = "contact_position", length = 100)
+    private String contactPosition; // 联系人职位
     
     @Column(name = "industry", length = 100)
     private String industry; // 行业
@@ -63,54 +66,52 @@ public class Customer {
     @Column(name = "company_size", length = 50)
     private String companySize; // 公司规模
     
-    @Column(name = "customer_level", length = 50)
-    private String customerLevel; // 客户等级
-    
-    @Column(name = "customer_type", length = 50)
-    private String customerType; // 客户类型
-    
     @Column(name = "source", length = 50)
     private String source; // 来源
+    
+    @Column(name = "source_detail", length = 200)
+    private String sourceDetail; // 来源详情
+    
+    @Column(name = "status", length = 20)
+    private String status = "NEW"; // 状态: NEW, CONTACTED, QUALIFIED, UNQUALIFIED, CONVERTED
+    
+    @Column(name = "priority", length = 20)
+    private String priority = "MEDIUM"; // 优先级: LOW, MEDIUM, HIGH, URGENT
+    
+    @Column(name = "score")
+    private Integer score = 0; // 线索评分
+    
+    @Column(name = "estimated_value", precision = 18, scale = 2)
+    private BigDecimal estimatedValue; // 预估价值
+    
+    @Column(name = "estimated_close_date")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDateTime estimatedCloseDate; // 预估成交日期
     
     @Column(name = "owner_id", columnDefinition = "uuid")
     private UUID ownerId; // 所属销售
     
-    @Type(type = "jsonb")
-    @Column(name = "collaborator_ids", columnDefinition = "jsonb")
-    private List<UUID> collaboratorIds; // 协作人
-    
-    @Column(name = "parent_customer_id", columnDefinition = "uuid")
-    private UUID parentCustomerId; // 上级客户
-    
-    @Column(name = "is_key_customer")
-    private Boolean isKeyCustomer = false; // 是否重点客户
-    
-    @Column(name = "is_blacklist")
-    private Boolean isBlacklist = false; // 是否黑名单
-    
-    @Column(name = "is_public_pool")
-    private Boolean isPublicPool = false; // 是否在公海池
-    
-    @Column(name = "pool_entry_time")
+    @Column(name = "assigned_at")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime poolEntryTime; // 进入公海时间
+    private LocalDateTime assignedAt; // 分配时间
     
-    @Column(name = "pool_entry_reason", length = 500)
-    private String poolEntryReason; // 进入公海原因
-    
-    @Column(name = "last_follow_time")
+    @Column(name = "last_contact_time")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime lastFollowTime; // 最后跟进时间
+    private LocalDateTime lastContactTime; // 最后联系时间
     
-    @Column(name = "last_order_time")
+    @Column(name = "next_follow_time")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime lastOrderTime; // 最后成单时间
+    private LocalDateTime nextFollowTime; // 下次跟进时间
     
-    @Column(name = "org_unit_id", columnDefinition = "uuid")
-    private UUID orgUnitId; // 所属组织
+    @Column(name = "converted_customer_id", columnDefinition = "uuid")
+    private UUID convertedCustomerId; // 转换的客户ID
     
-    @Column(name = "status", length = 20)
-    private String status = "ACTIVE"; // 状态
+    @Column(name = "converted_at")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime convertedAt; // 转换时间
+    
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description; // 描述
     
     @Column(name = "remark", columnDefinition = "TEXT")
     private String remark; // 备注
@@ -146,14 +147,11 @@ public class Customer {
     private User owner;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_customer_id", insertable = false, updatable = false)
-    private Customer parentCustomer;
+    @JoinColumn(name = "converted_customer_id", insertable = false, updatable = false)
+    private Customer convertedCustomer;
     
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Contact> contacts;
-    
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Activity> activities;
+    @OneToMany(mappedBy = "lead", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<LeadFollowUp> followUps;
     
     @PrePersist
     protected void onCreate() {
@@ -166,17 +164,14 @@ public class Customer {
         if (deleted == null) {
             deleted = false;
         }
-        if (isKeyCustomer == null) {
-            isKeyCustomer = false;
-        }
-        if (isBlacklist == null) {
-            isBlacklist = false;
-        }
-        if (isPublicPool == null) {
-            isPublicPool = false;
+        if (score == null) {
+            score = 0;
         }
         if (status == null) {
-            status = "ACTIVE";
+            status = "NEW";
+        }
+        if (priority == null) {
+            priority = "MEDIUM";
         }
     }
     
@@ -210,20 +205,44 @@ public class Customer {
         this.name = name;
     }
     
-    public String getShortName() {
-        return shortName;
+    public String getCompanyName() {
+        return companyName;
     }
     
-    public void setShortName(String shortName) {
-        this.shortName = shortName;
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
     
-    public String getUscc() {
-        return uscc;
+    public String getContactName() {
+        return contactName;
     }
     
-    public void setUscc(String uscc) {
-        this.uscc = uscc;
+    public void setContactName(String contactName) {
+        this.contactName = contactName;
+    }
+    
+    public String getContactPhone() {
+        return contactPhone;
+    }
+    
+    public void setContactPhone(String contactPhone) {
+        this.contactPhone = contactPhone;
+    }
+    
+    public String getContactEmail() {
+        return contactEmail;
+    }
+    
+    public void setContactEmail(String contactEmail) {
+        this.contactEmail = contactEmail;
+    }
+    
+    public String getContactPosition() {
+        return contactPosition;
+    }
+    
+    public void setContactPosition(String contactPosition) {
+        this.contactPosition = contactPosition;
     }
     
     public String getIndustry() {
@@ -266,28 +285,60 @@ public class Customer {
         this.companySize = companySize;
     }
     
-    public String getCustomerLevel() {
-        return customerLevel;
-    }
-    
-    public void setCustomerLevel(String customerLevel) {
-        this.customerLevel = customerLevel;
-    }
-    
-    public String getCustomerType() {
-        return customerType;
-    }
-    
-    public void setCustomerType(String customerType) {
-        this.customerType = customerType;
-    }
-    
     public String getSource() {
         return source;
     }
     
     public void setSource(String source) {
         this.source = source;
+    }
+    
+    public String getSourceDetail() {
+        return sourceDetail;
+    }
+    
+    public void setSourceDetail(String sourceDetail) {
+        this.sourceDetail = sourceDetail;
+    }
+    
+    public String getStatus() {
+        return status;
+    }
+    
+    public void setStatus(String status) {
+        this.status = status;
+    }
+    
+    public String getPriority() {
+        return priority;
+    }
+    
+    public void setPriority(String priority) {
+        this.priority = priority;
+    }
+    
+    public Integer getScore() {
+        return score;
+    }
+    
+    public void setScore(Integer score) {
+        this.score = score;
+    }
+    
+    public BigDecimal getEstimatedValue() {
+        return estimatedValue;
+    }
+    
+    public void setEstimatedValue(BigDecimal estimatedValue) {
+        this.estimatedValue = estimatedValue;
+    }
+    
+    public LocalDateTime getEstimatedCloseDate() {
+        return estimatedCloseDate;
+    }
+    
+    public void setEstimatedCloseDate(LocalDateTime estimatedCloseDate) {
+        this.estimatedCloseDate = estimatedCloseDate;
     }
     
     public UUID getOwnerId() {
@@ -298,92 +349,52 @@ public class Customer {
         this.ownerId = ownerId;
     }
     
-    public List<UUID> getCollaboratorIds() {
-        return collaboratorIds;
+    public LocalDateTime getAssignedAt() {
+        return assignedAt;
     }
     
-    public void setCollaboratorIds(List<UUID> collaboratorIds) {
-        this.collaboratorIds = collaboratorIds;
+    public void setAssignedAt(LocalDateTime assignedAt) {
+        this.assignedAt = assignedAt;
     }
     
-    public UUID getParentCustomerId() {
-        return parentCustomerId;
+    public LocalDateTime getLastContactTime() {
+        return lastContactTime;
     }
     
-    public void setParentCustomerId(UUID parentCustomerId) {
-        this.parentCustomerId = parentCustomerId;
+    public void setLastContactTime(LocalDateTime lastContactTime) {
+        this.lastContactTime = lastContactTime;
     }
     
-    public Boolean getIsKeyCustomer() {
-        return isKeyCustomer;
+    public LocalDateTime getNextFollowTime() {
+        return nextFollowTime;
     }
     
-    public void setIsKeyCustomer(Boolean isKeyCustomer) {
-        this.isKeyCustomer = isKeyCustomer;
+    public void setNextFollowTime(LocalDateTime nextFollowTime) {
+        this.nextFollowTime = nextFollowTime;
     }
     
-    public Boolean getIsBlacklist() {
-        return isBlacklist;
+    public UUID getConvertedCustomerId() {
+        return convertedCustomerId;
     }
     
-    public void setIsBlacklist(Boolean isBlacklist) {
-        this.isBlacklist = isBlacklist;
+    public void setConvertedCustomerId(UUID convertedCustomerId) {
+        this.convertedCustomerId = convertedCustomerId;
     }
     
-    public Boolean getIsPublicPool() {
-        return isPublicPool;
+    public LocalDateTime getConvertedAt() {
+        return convertedAt;
     }
     
-    public void setIsPublicPool(Boolean isPublicPool) {
-        this.isPublicPool = isPublicPool;
+    public void setConvertedAt(LocalDateTime convertedAt) {
+        this.convertedAt = convertedAt;
     }
     
-    public LocalDateTime getPoolEntryTime() {
-        return poolEntryTime;
+    public String getDescription() {
+        return description;
     }
     
-    public void setPoolEntryTime(LocalDateTime poolEntryTime) {
-        this.poolEntryTime = poolEntryTime;
-    }
-    
-    public String getPoolEntryReason() {
-        return poolEntryReason;
-    }
-    
-    public void setPoolEntryReason(String poolEntryReason) {
-        this.poolEntryReason = poolEntryReason;
-    }
-    
-    public LocalDateTime getLastFollowTime() {
-        return lastFollowTime;
-    }
-    
-    public void setLastFollowTime(LocalDateTime lastFollowTime) {
-        this.lastFollowTime = lastFollowTime;
-    }
-    
-    public LocalDateTime getLastOrderTime() {
-        return lastOrderTime;
-    }
-    
-    public void setLastOrderTime(LocalDateTime lastOrderTime) {
-        this.lastOrderTime = lastOrderTime;
-    }
-    
-    public UUID getOrgUnitId() {
-        return orgUnitId;
-    }
-    
-    public void setOrgUnitId(UUID orgUnitId) {
-        this.orgUnitId = orgUnitId;
-    }
-    
-    public String getStatus() {
-        return status;
-    }
-    
-    public void setStatus(String status) {
-        this.status = status;
+    public void setDescription(String description) {
+        this.description = description;
     }
     
     public String getRemark() {
@@ -458,27 +469,19 @@ public class Customer {
         this.owner = owner;
     }
     
-    public Customer getParentCustomer() {
-        return parentCustomer;
+    public Customer getConvertedCustomer() {
+        return convertedCustomer;
     }
     
-    public void setParentCustomer(Customer parentCustomer) {
-        this.parentCustomer = parentCustomer;
+    public void setConvertedCustomer(Customer convertedCustomer) {
+        this.convertedCustomer = convertedCustomer;
     }
     
-    public List<Contact> getContacts() {
-        return contacts;
+    public List<LeadFollowUp> getFollowUps() {
+        return followUps;
     }
     
-    public void setContacts(List<Contact> contacts) {
-        this.contacts = contacts;
-    }
-    
-    public List<Activity> getActivities() {
-        return activities;
-    }
-    
-    public void setActivities(List<Activity> activities) {
-        this.activities = activities;
+    public void setFollowUps(List<LeadFollowUp> followUps) {
+        this.followUps = followUps;
     }
 }

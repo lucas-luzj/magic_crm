@@ -3,32 +3,23 @@ package com.magic.crm.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-
-import org.apache.ibatis.mapping.FetchType;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.Where;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 /**
- * 客户实体
+ * 供应商实体
  */
 @Entity
-@Table(name = "customers")
+@Table(name = "suppliers")
 @Where(clause = "deleted = false")
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-public class Customer {
+public class Supplier {
     
     @Id
     @GeneratedValue(generator = "uuid2")
@@ -37,10 +28,10 @@ public class Customer {
     private UUID id;
     
     @Column(name = "code", length = 50, unique = true, nullable = false)
-    private String code; // 客户编号
+    private String code; // 供应商编码
     
     @Column(name = "name", length = 200, nullable = false)
-    private String name; // 客户名称
+    private String name; // 供应商名称
     
     @Column(name = "short_name", length = 100)
     private String shortName; // 简称
@@ -63,63 +54,62 @@ public class Customer {
     @Column(name = "company_size", length = 50)
     private String companySize; // 公司规模
     
-    @Column(name = "customer_level", length = 50)
-    private String customerLevel; // 客户等级
+    @Column(name = "supplier_level", length = 50)
+    private String supplierLevel; // 供应商等级
     
-    @Column(name = "customer_type", length = 50)
-    private String customerType; // 客户类型
+    @Column(name = "supplier_type", length = 50)
+    private String supplierType; // 供应商类型
     
     @Column(name = "source", length = 50)
     private String source; // 来源
     
-    @Column(name = "owner_id", columnDefinition = "uuid")
-    private UUID ownerId; // 所属销售
-    
-    @Type(type = "jsonb")
-    @Column(name = "collaborator_ids", columnDefinition = "jsonb")
-    private List<UUID> collaboratorIds; // 协作人
-    
-    @Column(name = "parent_customer_id", columnDefinition = "uuid")
-    private UUID parentCustomerId; // 上级客户
-    
-    @Column(name = "is_key_customer")
-    private Boolean isKeyCustomer = false; // 是否重点客户
+    @Column(name = "status", length = 20)
+    private String status = "ACTIVE"; // 状态: ACTIVE, INACTIVE, SUSPENDED
     
     @Column(name = "is_blacklist")
     private Boolean isBlacklist = false; // 是否黑名单
     
-    @Column(name = "is_public_pool")
-    private Boolean isPublicPool = false; // 是否在公海池
+    @Column(name = "is_key_supplier")
+    private Boolean isKeySupplier = false; // 是否重点供应商
     
-    @Column(name = "pool_entry_time")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime poolEntryTime; // 进入公海时间
+    @Column(name = "payment_terms", length = 200)
+    private String paymentTerms; // 付款条件
     
-    @Column(name = "pool_entry_reason", length = 500)
-    private String poolEntryReason; // 进入公海原因
+    @Column(name = "delivery_terms", length = 200)
+    private String deliveryTerms; // 交货条件
     
-    @Column(name = "last_follow_time")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime lastFollowTime; // 最后跟进时间
+    @Column(name = "quality_rating")
+    private Integer qualityRating; // 质量评级 (1-5)
     
-    @Column(name = "last_order_time")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime lastOrderTime; // 最后成单时间
+    @Column(name = "service_rating")
+    private Integer serviceRating; // 服务评级 (1-5)
     
-    @Column(name = "org_unit_id", columnDefinition = "uuid")
-    private UUID orgUnitId; // 所属组织
+    @Column(name = "price_rating")
+    private Integer priceRating; // 价格评级 (1-5)
     
-    @Column(name = "status", length = 20)
-    private String status = "ACTIVE"; // 状态
+    @Column(name = "overall_rating")
+    private Integer overallRating; // 综合评级 (1-5)
+    
+    @Column(name = "last_evaluation_date")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDateTime lastEvaluationDate; // 最后评价日期
+    
+    @Column(name = "contract_start_date")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDateTime contractStartDate; // 合同开始日期
+    
+    @Column(name = "contract_end_date")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDateTime contractEndDate; // 合同结束日期
     
     @Column(name = "remark", columnDefinition = "TEXT")
     private String remark; // 备注
     
-    @Type(type = "jsonb")
+    @Type(JsonBinaryType.class)
     @Column(name = "attachments", columnDefinition = "jsonb")
     private List<Map<String, Object>> attachments; // 附件
     
-    @Type(type = "jsonb")
+    @Type(JsonBinaryType.class)
     @Column(name = "custom_fields", columnDefinition = "jsonb")
     private Map<String, Object> customFields; // 自定义字段
     
@@ -141,19 +131,15 @@ public class Customer {
     @JsonIgnore
     private Boolean deleted = false;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id", insertable = false, updatable = false)
-    private User owner;
+    // 关联关系将在后续实现
+    // @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // private List<SupplierContact> contacts;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_customer_id", insertable = false, updatable = false)
-    private Customer parentCustomer;
+    // @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // private List<SupplierProduct> products;
     
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Contact> contacts;
-    
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Activity> activities;
+    // @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // private List<SupplierEvaluation> evaluations;
     
     @PrePersist
     protected void onCreate() {
@@ -166,14 +152,11 @@ public class Customer {
         if (deleted == null) {
             deleted = false;
         }
-        if (isKeyCustomer == null) {
-            isKeyCustomer = false;
-        }
         if (isBlacklist == null) {
             isBlacklist = false;
         }
-        if (isPublicPool == null) {
-            isPublicPool = false;
+        if (isKeySupplier == null) {
+            isKeySupplier = false;
         }
         if (status == null) {
             status = "ACTIVE";
@@ -266,20 +249,20 @@ public class Customer {
         this.companySize = companySize;
     }
     
-    public String getCustomerLevel() {
-        return customerLevel;
+    public String getSupplierLevel() {
+        return supplierLevel;
     }
     
-    public void setCustomerLevel(String customerLevel) {
-        this.customerLevel = customerLevel;
+    public void setSupplierLevel(String supplierLevel) {
+        this.supplierLevel = supplierLevel;
     }
     
-    public String getCustomerType() {
-        return customerType;
+    public String getSupplierType() {
+        return supplierType;
     }
     
-    public void setCustomerType(String customerType) {
-        this.customerType = customerType;
+    public void setSupplierType(String supplierType) {
+        this.supplierType = supplierType;
     }
     
     public String getSource() {
@@ -290,36 +273,12 @@ public class Customer {
         this.source = source;
     }
     
-    public UUID getOwnerId() {
-        return ownerId;
+    public String getStatus() {
+        return status;
     }
     
-    public void setOwnerId(UUID ownerId) {
-        this.ownerId = ownerId;
-    }
-    
-    public List<UUID> getCollaboratorIds() {
-        return collaboratorIds;
-    }
-    
-    public void setCollaboratorIds(List<UUID> collaboratorIds) {
-        this.collaboratorIds = collaboratorIds;
-    }
-    
-    public UUID getParentCustomerId() {
-        return parentCustomerId;
-    }
-    
-    public void setParentCustomerId(UUID parentCustomerId) {
-        this.parentCustomerId = parentCustomerId;
-    }
-    
-    public Boolean getIsKeyCustomer() {
-        return isKeyCustomer;
-    }
-    
-    public void setIsKeyCustomer(Boolean isKeyCustomer) {
-        this.isKeyCustomer = isKeyCustomer;
+    public void setStatus(String status) {
+        this.status = status;
     }
     
     public Boolean getIsBlacklist() {
@@ -330,60 +289,84 @@ public class Customer {
         this.isBlacklist = isBlacklist;
     }
     
-    public Boolean getIsPublicPool() {
-        return isPublicPool;
+    public Boolean getIsKeySupplier() {
+        return isKeySupplier;
     }
     
-    public void setIsPublicPool(Boolean isPublicPool) {
-        this.isPublicPool = isPublicPool;
+    public void setIsKeySupplier(Boolean isKeySupplier) {
+        this.isKeySupplier = isKeySupplier;
     }
     
-    public LocalDateTime getPoolEntryTime() {
-        return poolEntryTime;
+    public String getPaymentTerms() {
+        return paymentTerms;
     }
     
-    public void setPoolEntryTime(LocalDateTime poolEntryTime) {
-        this.poolEntryTime = poolEntryTime;
+    public void setPaymentTerms(String paymentTerms) {
+        this.paymentTerms = paymentTerms;
     }
     
-    public String getPoolEntryReason() {
-        return poolEntryReason;
+    public String getDeliveryTerms() {
+        return deliveryTerms;
     }
     
-    public void setPoolEntryReason(String poolEntryReason) {
-        this.poolEntryReason = poolEntryReason;
+    public void setDeliveryTerms(String deliveryTerms) {
+        this.deliveryTerms = deliveryTerms;
     }
     
-    public LocalDateTime getLastFollowTime() {
-        return lastFollowTime;
+    public Integer getQualityRating() {
+        return qualityRating;
     }
     
-    public void setLastFollowTime(LocalDateTime lastFollowTime) {
-        this.lastFollowTime = lastFollowTime;
+    public void setQualityRating(Integer qualityRating) {
+        this.qualityRating = qualityRating;
     }
     
-    public LocalDateTime getLastOrderTime() {
-        return lastOrderTime;
+    public Integer getServiceRating() {
+        return serviceRating;
     }
     
-    public void setLastOrderTime(LocalDateTime lastOrderTime) {
-        this.lastOrderTime = lastOrderTime;
+    public void setServiceRating(Integer serviceRating) {
+        this.serviceRating = serviceRating;
     }
     
-    public UUID getOrgUnitId() {
-        return orgUnitId;
+    public Integer getPriceRating() {
+        return priceRating;
     }
     
-    public void setOrgUnitId(UUID orgUnitId) {
-        this.orgUnitId = orgUnitId;
+    public void setPriceRating(Integer priceRating) {
+        this.priceRating = priceRating;
     }
     
-    public String getStatus() {
-        return status;
+    public Integer getOverallRating() {
+        return overallRating;
     }
     
-    public void setStatus(String status) {
-        this.status = status;
+    public void setOverallRating(Integer overallRating) {
+        this.overallRating = overallRating;
+    }
+    
+    public LocalDateTime getLastEvaluationDate() {
+        return lastEvaluationDate;
+    }
+    
+    public void setLastEvaluationDate(LocalDateTime lastEvaluationDate) {
+        this.lastEvaluationDate = lastEvaluationDate;
+    }
+    
+    public LocalDateTime getContractStartDate() {
+        return contractStartDate;
+    }
+    
+    public void setContractStartDate(LocalDateTime contractStartDate) {
+        this.contractStartDate = contractStartDate;
+    }
+    
+    public LocalDateTime getContractEndDate() {
+        return contractEndDate;
+    }
+    
+    public void setContractEndDate(LocalDateTime contractEndDate) {
+        this.contractEndDate = contractEndDate;
     }
     
     public String getRemark() {
@@ -450,35 +433,28 @@ public class Customer {
         this.deleted = deleted;
     }
     
-    public User getOwner() {
-        return owner;
-    }
+    // 关联关系的getter和setter将在后续实现
+    // public List<SupplierContact> getContacts() {
+    //     return contacts;
+    // }
     
-    public void setOwner(User owner) {
-        this.owner = owner;
-    }
+    // public void setContacts(List<SupplierContact> contacts) {
+    //     this.contacts = contacts;
+    // }
     
-    public Customer getParentCustomer() {
-        return parentCustomer;
-    }
+    // public List<SupplierProduct> getProducts() {
+    //     return products;
+    // }
     
-    public void setParentCustomer(Customer parentCustomer) {
-        this.parentCustomer = parentCustomer;
-    }
+    // public void setProducts(List<SupplierProduct> products) {
+    //     this.products = products;
+    // }
     
-    public List<Contact> getContacts() {
-        return contacts;
-    }
+    // public List<SupplierEvaluation> getEvaluations() {
+    //     return evaluations;
+    // }
     
-    public void setContacts(List<Contact> contacts) {
-        this.contacts = contacts;
-    }
-    
-    public List<Activity> getActivities() {
-        return activities;
-    }
-    
-    public void setActivities(List<Activity> activities) {
-        this.activities = activities;
-    }
+    // public void setEvaluations(List<SupplierEvaluation> evaluations) {
+    //     this.evaluations = evaluations;
+    // }
 }
