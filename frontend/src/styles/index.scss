@@ -1,0 +1,149 @@
+// 全局样式重置
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+}
+
+#app {
+  height: 100%;
+}
+
+// 滚动条样式
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+  
+  &:hover {
+    background: #a8a8a8;
+  }
+}
+
+// Element Plus 样式覆盖
+.el-menu {
+  border-right: none !important;
+}
+
+.el-menu--horizontal {
+  border-bottom: none !important;
+}
+
+// 自定义类
+.flex {
+  display: flex;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+// 动画
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: all 0.3s ease;
+}
+
+.slide-right-enter-from {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.slide-right-leave-to {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+// 卡片阴影
+.card-shadow {
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.card-shadow-hover {
+  transition: box-shadow 0.3s ease;
+  
+  &:hover {
+    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.15);
+  }
+}
+
+// 渐变背景
+.gradient-bg {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gradient-primary {
+  background: linear-gradient(135deg, #409EFF 0%, #667eea 100%);
+}
+
+// 响应式工具类
+@media (max-width: 768px) {
+  .hidden-xs {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .hidden-sm {
+    display: none !important;
+  }
+}
+
+// 暗色主题变量
+:root {
+  --bg-color: #ffffff;
+  --text-color: #303133;
+  --border-color: #dcdfe6;
+  --sidebar-bg: #001529;
+  --sidebar-text: rgba(255, 255, 255, 0.65);
+  --sidebar-active: #1890ff;
+}
+
+.dark {
+  --bg-color: #141414;
+  --text-color: #ffffff;
+  --border-color: #434343;
+  --sidebar-bg: #001529;
+  --sidebar-text: rgba(255, 255, 255, 0.65);
+  --sidebar-active: #1890ff;
+}

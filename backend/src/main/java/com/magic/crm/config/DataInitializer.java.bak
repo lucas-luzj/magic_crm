@@ -1,0 +1,61 @@
+package com.magic.crm.config;
+
+import com.magic.crm.entity.User;
+import com.magic.crm.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
+@Component
+public class DataInitializer implements CommandLineRunner {
+    
+    private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
+    
+    @Autowired
+    private UserRepository userRepository;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    
+    @Override
+    public void run(String... args) throws Exception {
+        initializeDefaultUsers();
+    }
+    
+    private void initializeDefaultUsers() {
+        // 创建管理员用户
+        if (!userRepository.existsByUsername("admin")) {
+            User admin = new User();
+            admin.setUsername("admin");
+            admin.setEmail("admin@magic-crm.com");
+            admin.setPassword(passwordEncoder.encode("admin123"));
+            admin.setFullName("系统管理员");
+            admin.setRole(User.Role.ADMIN);
+            admin.setIsActive(true);
+            
+            userRepository.save(admin);
+            logger.info("创建默认管理员用户: admin");
+            logger.info("管理员密码哈希值: {}", admin.getPassword());
+        }
+        
+        // 创建测试用户
+        if (!userRepository.existsByUsername("testuser")) {
+            User testUser = new User();
+            testUser.setUsername("testuser");
+            testUser.setEmail("test@magic-crm.com");
+            testUser.setPassword(passwordEncoder.encode("user123"));
+            testUser.setFullName("测试用户");
+            testUser.setRole(User.Role.USER);
+            testUser.setIsActive(true);
+            
+            userRepository.save(testUser);
+            logger.info("创建默认测试用户: testuser");
+            logger.info("测试用户密码哈希值: {}", testUser.getPassword());
+        }
+        
+        logger.info("用户初始化完成");
+    }
+}

@@ -1,0 +1,298 @@
+/* 自定义属性面板样式 */
+
+.process-variables-container,
+.task-variables-container,
+.assignment-container,
+.service-task-container,
+.gateway-container,
+.condition-container {
+  padding: 10px 0;
+}
+
+.variables-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.variables-header label {
+  font-weight: 600;
+  color: #303133;
+  margin: 0;
+}
+
+.add-variable-btn,
+.add-mapping-btn {
+  background: #409eff;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s;
+}
+
+.add-variable-btn:hover,
+.add-mapping-btn:hover {
+  background: #337ecc;
+}
+
+.variables-list {
+  margin-bottom: 15px;
+}
+
+.variable-item {
+  display: grid;
+  grid-template-columns: 1fr 80px 1fr 30px;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  border: 1px solid #e9ecef;
+}
+
+.variable-name,
+.variable-value,
+.source-var,
+.target-var,
+.task-var,
+.process-var,
+.assignment-input,
+.implementation-input {
+  padding: 6px 10px;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  font-size: 13px;
+  transition: border-color 0.2s;
+}
+
+.variable-name:focus,
+.variable-value:focus,
+.source-var:focus,
+.target-var:focus,
+.task-var:focus,
+.process-var:focus,
+.assignment-input:focus,
+.implementation-input:focus {
+  border-color: #409eff;
+  outline: none;
+}
+
+.variable-type,
+.condition-type-select,
+.assignment-type-select,
+.implementation-type-select {
+  padding: 6px 8px;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  font-size: 13px;
+  background: white;
+}
+
+.remove-variable-btn {
+  background: #f56c6c;
+  color: white;
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.remove-variable-btn:hover {
+  background: #e54545;
+}
+
+.variables-help,
+.condition-help,
+.assignment-help {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: #f0f9ff;
+  border: 1px solid #b3d8ff;
+  border-radius: 4px;
+}
+
+.variables-help small,
+.condition-help small,
+.assignment-help small {
+  color: #606266;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.variables-section {
+  margin-bottom: 20px;
+}
+
+.variables-section label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #303133;
+  font-size: 13px;
+}
+
+.variable-mapping {
+  display: grid;
+  grid-template-columns: 1fr 30px 1fr 30px;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 8px;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.variable-mapping span {
+  text-align: center;
+  color: #909399;
+  font-weight: bold;
+}
+
+.assignment-type,
+.assignment-value,
+.implementation-type,
+.implementation-value {
+  margin-bottom: 15px;
+}
+
+.assignment-type label,
+.assignment-value label,
+.implementation-type label,
+.implementation-value label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #303133;
+  font-size: 13px;
+}
+
+.condition-expression {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: 'Courier New', monospace;
+  resize: vertical;
+  min-height: 60px;
+  transition: border-color 0.2s;
+}
+
+.condition-expression:focus {
+  border-color: #409eff;
+  outline: none;
+}
+
+.condition-expression::placeholder {
+  color: #c0c4cc;
+  font-style: italic;
+}
+
+.gateway-help {
+  padding: 15px;
+  background: #f0f9ff;
+  border: 1px solid #b3d8ff;
+  border-radius: 4px;
+}
+
+.gateway-help h4 {
+  margin: 0 0 10px 0;
+  color: #303133;
+  font-size: 14px;
+}
+
+.gateway-help ul {
+  margin: 0 0 15px 0;
+  padding-left: 20px;
+}
+
+.gateway-help li {
+  margin-bottom: 5px;
+  color: #606266;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.gateway-help p {
+  margin: 0;
+  color: #e6a23c;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .variable-item {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+  
+  .variable-mapping {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+  
+  .variable-mapping span {
+    display: none;
+  }
+}
+
+/* 属性面板整体样式增强 */
+:deep(.bpp-properties-panel .bio-properties-panel-group[data-group-id="process-variables"]),
+:deep(.bpp-properties-panel .bio-properties-panel-group[data-group-id="condition"]),
+:deep(.bpp-properties-panel .bio-properties-panel-group[data-group-id="task-variables"]),
+:deep(.bpp-properties-panel .bio-properties-panel-group[data-group-id="assignment"]),
+:deep(.bpp-properties-panel .bio-properties-panel-group[data-group-id="service-task"]),
+:deep(.bpp-properties-panel .bio-properties-panel-group[data-group-id="gateway"]) {
+  border: 1px solid #e4e7ed;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  overflow: hidden;
+}
+
+:deep(.bpp-properties-panel .bio-properties-panel-group[data-group-id="process-variables"] .bio-properties-panel-group-header),
+:deep(.bpp-properties-panel .bio-properties-panel-group[data-group-id="condition"] .bio-properties-panel-group-header),
+:deep(.bpp-properties-panel .bio-properties-panel-group[data-group-id="task-variables"] .bio-properties-panel-group-header),
+:deep(.bpp-properties-panel .bio-properties-panel-group[data-group-id="assignment"] .bio-properties-panel-group-header),
+:deep(.bpp-properties-panel .bio-properties-panel-group[data-group-id="service-task"] .bio-properties-panel-group-header),
+:deep(.bpp-properties-panel .bio-properties-panel-group[data-group-id="gateway"] .bio-properties-panel-group-header) {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: 600;
+  border: none;
+}
+
+/* 滚动条样式 */
+.variables-list::-webkit-scrollbar,
+.condition-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.variables-list::-webkit-scrollbar-track,
+.condition-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.variables-list::-webkit-scrollbar-thumb,
+.condition-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.variables-list::-webkit-scrollbar-thumb:hover,
+.condition-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

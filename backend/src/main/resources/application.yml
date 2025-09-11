@@ -1,0 +1,111 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: magic-crm-backend
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/magic_crm
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:!QAZ2wsx}
+    driver-class-name: org.postgresql.Driver
+    
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        # dialect: org.hibernate.dialect.PostgreSQLDialect
+        format-sql: true
+        sql-comments: true
+    open-in-view: false
+    
+  jackson:
+    default-property-inclusion: always
+    serialization:
+      write-dates-as-timestamps: false
+    time-zone: Asia/Shanghai
+    visibility:
+      getter: NONE
+      is-getter: NONE
+      setter: NONE
+      creator: NONE
+      field: ANY
+    
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB
+      max-request-size: 50MB
+      file-size-threshold: 2KB
+
+# JWT配置
+jwt:
+  secret: ${JWT_SECRET:mySecretKey123456789012345678901234567890}
+  expiration: 86400000 # 24小时
+  refresh-expiration: 604800000 # 7天
+
+# 日志配置
+logging:
+  level:
+    com.magic.crm: DEBUG
+    org.springframework.security: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/magic-crm.log
+
+# 管理端点
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# 文件上传配置
+file:
+  dm-path: E:/luzj/magic_crm/dm/
+  upload:
+    path: ${FILE_UPLOAD_PATH:E:/luzj/magic_crm/uploads/}
+
+# Flowable工作流配置
+flowable:
+  # 数据库配置
+  database-schema-update: true
+  db-history-used: true
+  
+  # 流程引擎配置
+  process:
+    definition-cache-limit: 10
+    enable-safe-xml: true
+    
+  # 异步执行器配置
+  async:
+    executor:
+      default-async-job-acquire-wait-time: 10000
+      default-timer-job-acquire-wait-time: 10000
+      
+  # REST API配置 - 禁用内置REST API避免servlet冲突
+  rest:
+    enabled: false
+      
+  # 历史配置
+  history-level: full
+  
+  # IDM身份管理配置
+  idm:
+    enabled: true
+    password-encoder: spring_bcrypt
+    
+  # 流程图字体配置（解决中文乱码）
+  activity-font-name: 宋体
+  label-font-name: 宋体
+  annotation-font-name: 宋体
