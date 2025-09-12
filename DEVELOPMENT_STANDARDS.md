@@ -9,25 +9,21 @@
 - **状态管理**: Pinia 3.0.3
 - **路由管理**: Vue Router 4.5.1
 - **HTTP客户端**: Axios 1.11.0
-- **工作流设计**: BPMN.js 18.6.3 + Camunda BPMN Moddle
 - **图表库**: ECharts 6.0.0
 - **样式预处理**: Sass 1.91.0
-- **表单组件**: lucas-my-form 1.25.90301 (自定义表单组件库)
 
 ### 1.2 后端技术栈
 - **框架**: Spring Boot 3.5.5
 - **Java版本**: JDK 17
 - **数据库**: PostgreSQL
-- **ORM框架**: Spring Data JPA + Hibernate
+- **ORM框架**: Spring Data JPA
 - **安全框架**: Spring Security + JWT
-- **工作流引擎**: Flowable 7.2.0
 - **数据库迁移**: Flyway 11.7.2
 - **构建工具**: Maven
 - **开发工具**: Lombok, Spring Boot DevTools
 
 ### 1.3 数据库与中间件
 - **主数据库**: PostgreSQL
-- **JSON支持**: Hypersistence Utils for Hibernate
 - **JWT库**: JJWT 0.12.3
 - **中文拼音**: Pinyin4j 2.5.1
 
@@ -76,7 +72,7 @@ backend/src/main/java/com/magic/crm/
 ### 2.2 环境配置要求
 - **Node.js**: >= 16.0.0
 - **Java**: JDK 17
-- **PostgreSQL**: >= 12.0
+- **PostgreSQL**: >= 17.0
 - **Maven**: >= 3.6.0
 
 ### 2.3 依赖管理方式
@@ -90,13 +86,46 @@ backend/src/main/java/com/magic/crm/
 
 #### 请求格式
 ```javascript
-// GET请求
-GET /api/users?page=1&size=10&search=keyword
+// 整个项目使用POST方式， 不使用REST Api， 
 
-// POST/PUT请求
+// POST
 {
   "field1": "value1",
   "field2": "value2"
+}
+
+// 请求命名方式
+// 分页请求
+/api/moduleName/list
+{
+  pageIndex,
+  pageSize,
+  filters:{...}
+  sort:"排序要求",
+}
+
+// 查询单挑数据
+/api/moduleName/get 
+{id}
+
+// 新增或修改单条数据
+/api/moduleName/update
+{
+  id:0,//新增
+  id:xxx,//修改
+  ...//其它字段数据
+}
+
+// 删除数据
+/api/moduleName/delete
+{
+  id:xxx
+}
+
+// 其它功能操作
+/api/moduleName/functionName
+{
+  ...
 }
 ```
 
@@ -126,11 +155,10 @@ GET /api/users?page=1&size=10&search=keyword
   "success": true,
   "message": "查询成功",
   "data": {
-    "content": [...],
-    "totalElements": 100,
-    "totalPages": 10,
-    "size": 10,
-    "number": 0
+    "totalCount": 100,
+    "pageIndex": 0
+    "pageCount": 10,
+    "records": [...],
   }
 }
 ```
@@ -174,26 +202,11 @@ config.headers['Authorization'] = `Bearer ${token}`
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref, reactive } from 'vue'
 
-export default {
-  name: 'ComponentName', // PascalCase
-  setup() {
-    // 使用Composition API
-    const state = reactive({
-      loading: false
-    })
-    
-    const handleClick = () => {
-      // 处理逻辑
-    }
-    
-    return {
-      state,
-      handleClick
-    }
-  }
+
+// 使用Composition API
 }
 </script>
 
@@ -213,13 +226,14 @@ export default {
 
 ### 4.2 后端代码规范
 
+最重要的： 按业务功能模块组织代码
+
 #### Java类规范
 ```java
 @Entity
 @Table(name = "users")
 @Data                    // Lombok注解
 @NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class User implements UserDetails {
     
@@ -245,16 +259,16 @@ public class UserController {
     @Autowired
     private UserService userService;
     
-    @GetMapping
+    @PostMapping("/list")
     public PageResponse<User> getUsers(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return userService.getUsers(page, size);
+            @RequestParam(defaultValue = "0") int pageIndex,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        return userService.getUsers(pageIndex, pageSize);
     }
     
-    @PostMapping
+    @PostMapping("/update")
     @PreAuthorize("hasRole('ADMIN')")
-    public ApiResponse<User> createUser(@Valid @RequestBody User user) {
+    public ApiResponse<User> updateUser(@Valid @RequestBody User user) {
         return ApiResponse.success(userService.createUser(user));
     }
 }
@@ -403,7 +417,6 @@ public class UserService {
 // 前端开发代理
 proxy: {
   '/api': 'http://localhost:8080',
-  '/dm': 'http://localhost:8080',
   '/uploads': 'http://localhost:8080'
 }
 ```
@@ -433,7 +446,6 @@ flowable:
 - **request.js**: 统一HTTP请求封装
 - **auth.js**: 认证相关工具函数
 - **SearchContainer.vue**: 通用搜索容器组件
-- **lucas-my-form**: 自定义表单组件库
 
 ### 8.2 后端工具
 - **ApiResponse**: 统一响应格式封装

@@ -1,2 +1,0 @@
--- 数据初始化现在通过 DataInitializer.java 完成
--- 这个文件保留为空，避免SQL初始化冲突
